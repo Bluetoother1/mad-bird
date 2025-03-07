@@ -63,6 +63,7 @@ pipe_rotate_x = SCREEN_WIDTH
 pipe_rotate_y = 0
 enemy_x = pipe_x
 enemy_y = (pipe_y+pipe_rotate_y)/2 + enemy_images[0].get_height()/2
+# pipe_random_y = randint(-PIPE_GAP, PIPE_GAP)
 pipe_random_y = randint(-PIPE_GAP, PIPE_GAP)
 rocket_x, rocket_y = 0, 0
 fire_flag = False
@@ -118,7 +119,7 @@ def draw_pipes_and_enemy():
 
 
 def update_pipes_and_enemy():
-    global enemy_x, pipe_x, pipe_rotate_x, pipe_random_y, game_score
+    global enemy_x, pipe_x, pipe_rotate_x, pipe_random_y, game_score, pipe_rotate_transform_y, pipe_transform_y
     pipe_x -= pipe_speed
     pipe_rotate_x -= pipe_speed
     if pipe_x < -130:
@@ -127,6 +128,8 @@ def update_pipes_and_enemy():
         pipe_rotate_x = SCREEN_WIDTH
         enemy_x = SCREEN_WIDTH+10
         game_score += 1
+        pipe_transform_y = pipe_y + PIPE_GAP - pipe_random_y
+        pipe_rotate_transform_y = pipe_rotate_y - PIPE_GAP - pipe_random_y
 
 
 def draw_rocket():
@@ -216,7 +219,6 @@ font = pygame.font.Font(None, 36)
 background_sound.play(-1)
 clock = pygame.time.Clock()
 running = True
-game_start = True
 
 while running:
     for event in pygame.event.get():
@@ -230,41 +232,40 @@ while running:
                 rocket_x = hero_x + hero_images[0].get_width() + 20
                 rocket_y = hero_y + hero_images[0].get_height() / 2
 
-    if game_start:
-        draw_background()
-        update_background()
-        draw_hero()
-        update_hero()
-        draw_pipes_and_enemy()
-        update_pipes_and_enemy()
-        update_enemy()
-        draw_rocket()
-        update_rocket()
-        check_collisions()
-        more_diff()
+    draw_background()
+    update_background()
+    draw_hero()
+    update_hero()
+    draw_pipes_and_enemy()
+    update_pipes_and_enemy()
+    update_enemy()
+    draw_rocket()
+    update_rocket()
+    check_collisions()
+    more_diff()
 
-        if game_over_flag:
-            reset_game()
+    if game_over_flag:
+        reset_game()
 
-        #  Отображение счета и условий игры
+    #  Отображение счета и условий игры
 
-        fire_button = game_font.render(f"Use button F for fire", True, 'white')
-        score_text = game_font.render(f"Your score: {game_score}", True, 'red')
-        max_score_text = game_font.render(
-            f"Max score: {max_score}", True, 'red')
-        game_speed_text = game_font.render(
-            f"Game speed: {pipe_speed}", True, 'red')
-        delta_text = game_font.render(
-            f"Enemy spawn: {delta_score}", True, 'red')
-        screen.blit(score_text, (20, 20))
-        screen.blit(max_score_text, (20, 50))
-        screen.blit(game_speed_text, (320, 20))
-        screen.blit(delta_text, (320, 50))
-        screen.blit(fire_button, (20, SCREEN_HEIGHT-20))
-        if game_score > max_score:
-            max_score = game_score
-            with open("max_score.txt", "w") as file:
-                file.write(str(max_score))
+    fire_button = game_font.render(f"Use button F for fire", True, 'white')
+    score_text = game_font.render(f"Your score: {game_score}", True, 'red')
+    max_score_text = game_font.render(
+        f"Max score: {max_score}", True, 'red')
+    game_speed_text = game_font.render(
+        f"Game speed: {pipe_speed}", True, 'red')
+    delta_text = game_font.render(
+        f"Enemy spawn: {delta_score}", True, 'red')
+    screen.blit(score_text, (20, 20))
+    screen.blit(max_score_text, (20, 50))
+    screen.blit(game_speed_text, (320, 20))
+    screen.blit(delta_text, (320, 50))
+    screen.blit(fire_button, (20, SCREEN_HEIGHT-20))
+    if game_score > max_score:
+        max_score = game_score
+        with open("max_score.txt", "w") as file:
+            file.write(str(max_score))
     pygame.display.flip()
     clock.tick(FPS)
 
